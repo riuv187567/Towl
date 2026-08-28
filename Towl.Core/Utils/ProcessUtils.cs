@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Towl.Utils;
+namespace Towl.Core.Utils;
 
 public class ProcessUtils
 {

@@ -1,20 +1,22 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Towl.Data;
+using System.Drawing;
+using Towl.Core.Data;
 
-namespace Towl.Services;
+namespace Towl.Core.Services;
 
-public class CursorMovedTestBackgroundService(TowlState state) : BackgroundService
+public class CursorMovedTestBackgroundService(Func<Point> cursorPosition, TowlState state) : BackgroundService
 {
+    private readonly Func<Point> _cursorPosition = cursorPosition;
     private readonly TowlState _state = state;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var time = new PeriodicTimer(TimeSpan.FromSeconds(Constants.CursorMoveTimeout));
-        var cursorPosition = Cursor.Position;
+        var cursorPosition = _cursorPosition();
 
         while (await time.WaitForNextTickAsync(stoppingToken))
         {
-            var newCursorPosition = Cursor.Position;
+            var newCursorPosition = _cursorPosition();
 
             _state.CursorMoved = newCursorPosition != cursorPosition;
             cursorPosition = newCursorPosition;

@@ -1,4 +1,4 @@
-﻿namespace Towl.Data;
+﻿namespace Towl.Core.Data;
 
 public class TrackedProcessSettings()
 {

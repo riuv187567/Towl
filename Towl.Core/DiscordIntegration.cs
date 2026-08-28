@@ -1,8 +1,8 @@
 ﻿using DiscordRPC;
-using Towl.Data;
-using Towl.Utils;
+using Towl.Core.Data;
+using Towl.Core.Utils;
 
-namespace Towl;
+namespace Towl.Core;
 
 public class DiscordIntegration : IDisposable
 {

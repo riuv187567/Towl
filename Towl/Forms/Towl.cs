@@ -1,5 +1,6 @@
-using Towl.Data;
-using Towl.Utils;
+using Towl.Core;
+using Towl.Core.Data;
+using Towl.Core.Utils;
 
 namespace Towl;
 

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Towl.Data;
+namespace Towl.Core.Data;
 
 public static class TowlDataManager
 {

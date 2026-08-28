@@ -1,7 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Towl.Data;
-using Towl.Services;
+using Towl.Core;
+using Towl.Core.Data;
+using Towl.Core.Services;
 
 namespace Towl;
 
@@ -28,7 +29,7 @@ public static class Program
 
         builder.Services.AddSingleton<DiscordIntegration>();
         builder.Services.AddHostedService<TimerBackgroundService>();
-        builder.Services.AddHostedService<CursorMovedTestBackgroundService>();
+        builder.Services.AddHostedService(sp => new CursorMovedTestBackgroundService(() => Cursor.Position, state));
 
         builder.Services.AddSingleton<Towl>();
 
