@@ -4,9 +4,9 @@ using Towl.Utils;
 
 namespace Towl.Services;
 
-public class TimerBackgroundService(ApplicationState state) : BackgroundService
+public class TimerBackgroundService(TowlState state) : BackgroundService
 {
-    private readonly ApplicationState _state = state;
+    private readonly TowlState _state = state;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -14,7 +14,7 @@ public class TimerBackgroundService(ApplicationState state) : BackgroundService
 
         while (await time.WaitForNextTickAsync(stoppingToken))
         {
-            var today = DateOnly.FromDateTime(DateTime.Now);
+            var today = TimeUtils.GetToday();
 
             if (!_state.CursorMoved)
                 continue;

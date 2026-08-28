@@ -43,7 +43,6 @@ partial class Towl
         sessionTime.TabIndex = 0;
         sessionTime.Text = "00:00:00";
         sessionTime.TextAlign = ContentAlignment.MiddleCenter;
-        sessionTime.Click += sessionTime_Click;
         // 
         // Towl
         // 
@@ -63,6 +62,4 @@ partial class Towl
     #endregion
 
     private Label sessionTime;
-    private System.ComponentModel.BackgroundWorker backgroundWorker1;
-    private System.ComponentModel.BackgroundWorker backgroundWorker2;
 }

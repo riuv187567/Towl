@@ -15,10 +15,10 @@ public static class Program
     {
         ApplicationConfiguration.Initialize();
 
-        var state = new ApplicationState()
+        var state = new TowlState()
         {
-            Data = ApplicationDataManager.LoadData(),
-            Settings = ApplicationDataManager.LoadSettings(),
+            Data = TowlDataManager.LoadData(),
+            Settings = TowlDataManager.LoadSettings(),
             CursorMoved = false,
         };
 

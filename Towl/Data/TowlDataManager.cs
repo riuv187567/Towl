@@ -2,43 +2,43 @@
 
 namespace Towl.Data;
 
-public static class ApplicationDataManager
+public static class TowlDataManager
 {
     private readonly static JsonSerializerOptions _options = new() { WriteIndented = true };
 
-    public static ApplicationSettings LoadSettings()
+    public static TowlSettings LoadSettings()
     {
         try
         {
-            return JsonSerializer.Deserialize<ApplicationSettings>(File.ReadAllText(Constants.ApplicationSettingsFile))!;
+            return JsonSerializer.Deserialize<TowlSettings>(File.ReadAllText(Constants.ApplicationSettingsFile))!;
         }
         catch (FileNotFoundException)
         {
-            var settings = new ApplicationSettings();
+            var settings = new TowlSettings();
             var jsonString = JsonSerializer.Serialize(settings, _options);
             File.WriteAllText(Constants.ApplicationSettingsFile, jsonString);
         }
 
-        return new ApplicationSettings();
+        return new TowlSettings();
     }
 
-    public static ApplicationSessionData LoadData()
+    public static TowlSessionData LoadData()
     {
         try
         {
-            return JsonSerializer.Deserialize<ApplicationSessionData>(File.ReadAllText(Constants.ApplicationDataFile))!;
+            return JsonSerializer.Deserialize<TowlSessionData>(File.ReadAllText(Constants.ApplicationDataFile))!;
         }
         catch (FileNotFoundException)
         {
-            var data = new ApplicationSessionData();
+            var data = new TowlSessionData();
             var jsonString = JsonSerializer.Serialize(data, _options);
             File.WriteAllText(Constants.ApplicationDataFile, jsonString);
         }
 
-        return new ApplicationSessionData();
+        return new TowlSessionData();
     }
 
-    public static void SaveData(ApplicationSessionData data)
+    public static void SaveData(TowlSessionData data)
     {
         var jsonString = JsonSerializer.Serialize(data, _options);
         File.WriteAllText(Constants.ApplicationDataFile, jsonString);

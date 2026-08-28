@@ -1,32 +1,47 @@
 ﻿using DiscordRPC;
+using Towl.Data;
 using Towl.Utils;
 
 namespace Towl;
 
 public class DiscordIntegration : IDisposable
 {
-    private readonly string DISCORD_APP_ID = "1539586832474574850";
-    private readonly DiscordRpcClient client;
+    private readonly TowlState _state;
+    private readonly DiscordRpcClient? _client;
 
-    public DiscordIntegration()
+    public DiscordIntegration(TowlState state)
     {
-        client = new DiscordRpcClient(DISCORD_APP_ID);
+        _state = state;
 
-        client.OnReady += (sender, e) =>
+        try
         {
-            Console.WriteLine("Connected to discord with user {0}", e.User.Username);
-            Console.WriteLine("Avatar: {0}", e.User.GetAvatarURL(User.AvatarFormat.WebP));
-            Console.WriteLine("Decoration: {0}", e.User.GetAvatarDecorationURL());
-        };
+            _client = new DiscordRpcClient(_state.Settings.DiscordAppId);
 
-        client.Initialize();
+            _client.OnReady += (sender, e) =>
+            {
+                Console.WriteLine("Connected to discord with user {0}", e.User.Username);
+                Console.WriteLine("Avatar: {0}", e.User.GetAvatarURL(User.AvatarFormat.WebP));
+                Console.WriteLine("Decoration: {0}", e.User.GetAvatarDecorationURL());
+            };
 
-        SetDescription($"Tracked Time - {TimeUtils.HumanizeTime(7061760)}");
+            _client.OnError += (sender, e) =>
+            {
+                // Nothing
+            };
+
+            _client.Initialize();
+
+            SetDescription($"Tracked Time - {TimeUtils.HumanizeTime(7061760)}");
+        }
+        catch (Exception)
+        {
+            _client = null;
+        }
     }
 
     public void SetDescription(string description)
     {
-        client.SetPresence(new RichPresence()
+        _client?.SetPresence(new RichPresence()
         {
             Type = ActivityType.Playing,
             Details = description,
@@ -34,8 +49,5 @@ public class DiscordIntegration : IDisposable
         });
     }
 
-    public void Dispose()
-    {
-        client.Dispose();
-    }
+    public void Dispose() => _client?.Dispose();
 }

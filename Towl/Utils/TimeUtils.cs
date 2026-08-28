@@ -10,4 +10,6 @@ public static class TimeUtils
 
         return $"{hours.ToString("D2")}:{minutes.ToString("D2")}:{seconds.ToString("D2")}";
     }
+
+    public static DateOnly GetToday() => DateOnly.FromDateTime(DateTime.Now);
 }

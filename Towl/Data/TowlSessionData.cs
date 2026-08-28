@@ -7,7 +7,7 @@ public class ProcessEntry()
     public Dictionary<DateOnly, long> DateEntries { get; set; } = [];
 }
 
-public struct ApplicationSessionData()
+public struct TowlSessionData()
 {
     public Dictionary<string, ProcessEntry> ProcessEntries { get; set; } = [];
 }

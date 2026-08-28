@@ -5,10 +5,10 @@ namespace Towl;
 
 public partial class Towl : Form
 {
-    private readonly ApplicationState _state;
+    private readonly TowlState _state;
     private readonly DiscordIntegration _discord;
 
-    public Towl(ApplicationState state, DiscordIntegration discord)
+    public Towl(TowlState state, DiscordIntegration discord)
     {
         InitializeComponent();
 
@@ -24,34 +24,35 @@ public partial class Towl : Form
 
     private async Task RunTimerAsync()
     {
+        await UpdateTimer();
         var time = new PeriodicTimer(TimeSpan.FromSeconds(Constants.CycleSeconds));
 
         while (await time.WaitForNextTickAsync())
         {
-            var displayedProcName = _state.Settings.DisplayedProcessName;
-            if (!_state.Data.ProcessEntries.TryGetValue(_state.Settings.DisplayedProcessName, out var process))
-            {
-                sessionTime.BackColor = Constants.NotActiveColor;
-                sessionTime.Text = Constants.NoProcessDisplayedText;
-            }
-            else
-            {
-                if (ProcessUtils.ProcessIsFocused(displayedProcName) && _state.CursorMoved)
-                    sessionTime.BackColor = Constants.ActiveColor;
-                else
-                    sessionTime.BackColor = Constants.NotActiveColor;
-
-                sessionTime.Text = TimeUtils.HumanizeTime(process.TotalSeconds);
-                _discord.SetDescription($"Tracked Time - {TimeUtils.HumanizeTime(process.TotalSeconds)}");
-            }
-
+            await UpdateTimer();
             await Task.Delay(Constants.CycleSeconds);
-            ApplicationDataManager.SaveData(_state.Data);
+            TowlDataManager.SaveData(_state.Data);
         }
     }
 
-    private void sessionTime_Click(object sender, EventArgs e)
+    private async Task UpdateTimer()
     {
+        var displayedProcName = _state.Settings.DisplayedProcessName;
+        if (!_state.Data.ProcessEntries.TryGetValue(_state.Settings.DisplayedProcessName, out var process))
+        {
+            sessionTime.BackColor = Constants.NotActiveColor;
+            sessionTime.Text = Constants.NoProcessDisplayedText;
+        }
+        else
+        {
+            if (ProcessUtils.ProcessIsFocused(displayedProcName) && _state.CursorMoved)
+                sessionTime.BackColor = Constants.ActiveColor;
+            else
+                sessionTime.BackColor = Constants.NotActiveColor;
 
+            var todayTimeString = TimeUtils.HumanizeTime(_state.Data.GetTodaySeconds(process.Name));
+            sessionTime.Text = todayTimeString;
+            _discord.SetDescription($"Tracked Time - {todayTimeString}");
+        }
     }
 }

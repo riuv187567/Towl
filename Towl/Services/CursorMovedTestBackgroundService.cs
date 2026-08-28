@@ -3,9 +3,9 @@ using Towl.Data;
 
 namespace Towl.Services;
 
-public class CursorMovedTestBackgroundService(ApplicationState state) : BackgroundService
+public class CursorMovedTestBackgroundService(TowlState state) : BackgroundService
 {
-    private readonly ApplicationState _state = state;
+    private readonly TowlState _state = state;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
