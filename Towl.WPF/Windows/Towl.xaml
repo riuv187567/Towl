@@ -9,7 +9,7 @@
     <Grid>
         <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
             <TextBlock Name="MainTimeText" Text="00:00:00" Margin="0,0,0,0" FontFamily="Arial" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
-            <Rectangle Name="StatusBar" Height="4" Fill="#FF08FF00" HorizontalAlignment="Center" VerticalAlignment="Center" Width="96" RadiusY="4" RadiusX="4" />
+            <Rectangle Name="StatusBar" Height="4" HorizontalAlignment="Center" VerticalAlignment="Center" Width="96" RadiusY="4" RadiusX="4" />
             <TextBlock Name="SecondaryTimeText" Text="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#C4C5C6"/>
         </WrapPanel>
     </Grid>

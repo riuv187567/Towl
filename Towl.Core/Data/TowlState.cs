@@ -1,4 +1,7 @@
-﻿namespace Towl.Core.Data;
+﻿using Towl.Core.Data.Session;
+using Towl.Core.Data.Settings;
+
+namespace Towl.Core.Data;
 
 public class TowlState
 {

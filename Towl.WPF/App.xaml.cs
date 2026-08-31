@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Forms;
 using Towl.Core;
 using Towl.Core.Data;
 using Towl.Core.Services;
@@ -13,7 +12,7 @@ namespace Towl.WPF
 {
     public partial class App : Application
     {
-        private System.Windows.Forms.NotifyIcon? _notifyIcon;
+        private NotifyIcon? _notifyIcon;
         private bool _isExit;
         private IHost? _host;
         private TowlWindow? _towlWindow;

@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using Towl.Core;
 using Towl.Core.Data;
+using Towl.Core.Data.Session;
 using Towl.Core.Utils;
 
 namespace Towl.WPF
@@ -48,7 +49,7 @@ namespace Towl.WPF
 
             var todayTimeString = TimeUtils.HumanizeTime(_state.Data.GetTodaySeconds(process.Name));
             MainTimeText.Text = todayTimeString;
-            _discord.SetDescription($"Tracked Time - {todayTimeString}");
+            _discord.SetDescription($"Tracked Time - {todayTimeString}"); // Todo: This should be moved to somewhere else
         }
 
         private async Task UpdateSecondaryTimer()

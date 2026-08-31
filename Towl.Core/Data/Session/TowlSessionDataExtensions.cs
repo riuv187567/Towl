@@ -1,4 +1,4 @@
-﻿namespace Towl.Core.Data;
+﻿namespace Towl.Core.Data.Session;
 
 public static class TowlSessionDataExtensions
 {
