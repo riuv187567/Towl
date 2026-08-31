@@ -69,17 +69,17 @@ namespace Towl.WPF
 
             var activeColor = new SolidColorBrush
             {
-                Color = Color.FromArgb(Constants.ActiveColor.A, Constants.ActiveColor.R, Constants.ActiveColor.G, Constants.ActiveColor.B)
+                Color = System.Windows.Media.Color.FromArgb(Constants.ActiveColor.A, Constants.ActiveColor.R, Constants.ActiveColor.G, Constants.ActiveColor.B)
             };
 
             var notActiveColor = new SolidColorBrush
             {
-                Color = Color.FromArgb(Constants.NotActiveColor.A, Constants.NotActiveColor.R, Constants.NotActiveColor.G, Constants.NotActiveColor.B)
+                Color = System.Windows.Media.Color.FromArgb(Constants.NotActiveColor.A, Constants.NotActiveColor.R, Constants.NotActiveColor.G, Constants.NotActiveColor.B)
             };
 
             var notFoundColor = new SolidColorBrush
             {
-                Color = Color.FromArgb(Constants.NotFoundColor.A, Constants.NotFoundColor.R, Constants.NotFoundColor.G, Constants.NotFoundColor.B)
+                Color = System.Windows.Media.Color.FromArgb(Constants.NotFoundColor.A, Constants.NotFoundColor.R, Constants.NotFoundColor.G, Constants.NotFoundColor.B)
             };
 
             if (!_state.Data.ProcessEntries.TryGetValue(displayedProcName, out var process))
