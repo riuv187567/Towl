@@ -8,4 +8,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Towl.Core\Towl.Core.csproj" />
+  </ItemGroup>
+
 </Project>
