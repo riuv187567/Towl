@@ -9,6 +9,7 @@ public static class Constants
 
     public static Color ActiveColor = Color.PaleGreen;
     public static Color NotActiveColor = Color.PaleVioletRed;
+    public static Color NotFoundColor = Color.LightGray;
 
     public const string ApplicationDataFile = "Data.json";
     public const string ApplicationSettingsFile = "Settings.json";
