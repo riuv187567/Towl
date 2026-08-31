@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
 using Towl.Core;
 using Towl.Core.Data;
 using Towl.Core.Services;
+using Towl.Core.Utils;
 
 namespace Towl.WPF
 {
@@ -31,13 +30,7 @@ namespace Towl.WPF
             builder.Services.AddSingleton<DiscordIntegration>();
             builder.Services.AddHostedService<TimerBackgroundService>();
 
-            static System.Drawing.Point mousePosition()
-            {
-                var point = Mouse.GetPosition(Application.Current.MainWindow);
-                return new System.Drawing.Point((int)point.X, (int)point.Y);
-            }
-
-            builder.Services.AddHostedService(sp => new CursorMovedTestBackgroundService(mousePosition, state));
+            builder.Services.AddHostedService(sp => new CursorMovedTestBackgroundService(ProcessUtils.GetCursorPosition, state));
 
             builder.Services.AddSingleton<TowlWindow>();
 
@@ -46,14 +39,12 @@ namespace Towl.WPF
 
             var form = _host.Services.GetRequiredService<TowlWindow>();
             form.Show();
-
-            _host.StopAsync().GetAwaiter().GetResult();
-            _host.Dispose();
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            _host!.Dispose();
+            _host!.StopAsync().GetAwaiter().GetResult();
+            _host.Dispose();
             base.OnExit(e);
         }
     }
