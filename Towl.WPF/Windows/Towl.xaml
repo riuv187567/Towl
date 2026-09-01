@@ -5,12 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Towl.WPF"
         mc:Ignorable="d"
-        Title="Towl" Topmost="True" ResizeMode="CanMinimize" Background="#1F2023" Width="256" Height="128">
-    <Grid>
-        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
-            <TextBlock Name="MainTimeText" Text="00:00:00" Margin="0,0,0,0" FontFamily="Arial" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
-            <Rectangle Name="StatusBar" Height="4" HorizontalAlignment="Center" VerticalAlignment="Center" Width="96" RadiusY="4" RadiusX="4" />
-            <TextBlock Name="SecondaryTimeText" Text="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#C4C5C6"/>
-        </WrapPanel>
-    </Grid>
+        Title="Towl" WindowStyle="None" MouseLeftButtonDown="Window_MouseLeftButtonDown" Topmost="True" ResizeMode="CanMinimize" Width="256" Height="168" Background="{x:Null}" AllowsTransparency="True" Foreground="{x:Null}">
+    <Border CornerRadius="5" Background="#FF1F2023" BorderBrush="Gray" BorderThickness="0.5">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="ButtonMinimize" Content="-" Width="40" Height="40" BorderBrush="Transparent" Background="Transparent" Foreground="#C4C5C6"/>
+                <Button x:Name="ButtonClose" Content="X" Width="40" Height="40" BorderBrush="Transparent" Background="Transparent" Foreground="#C4C5C6"/>
+            </StackPanel>
+
+            <WrapPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
+                <TextBlock Name="MainTimeText" Text="00:00:00" Margin="0,0,0,0" FontFamily="Arial" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                <Rectangle Name="StatusBar" Height="4" HorizontalAlignment="Center" VerticalAlignment="Center" Width="96" RadiusY="4" RadiusX="4" />
+                <TextBlock Name="SecondaryTimeText" Text="00:00:00" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#C4C5C6"/>
+            </WrapPanel>
+        </Grid>
+    </Border>
 </Window>
