@@ -12,10 +12,12 @@ namespace Towl.WPF
 {
     public partial class App : Application
     {
-        private NotifyIcon? _notifyIcon;
-        private bool _isExit;
         private IHost? _host;
-        private TowlWindow? _towlWindow;
+        private TowlWindow? _towlMainWindow;
+
+        private NotifyIcon? _towlNotifyIcon;
+
+        private bool _isExit;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -33,75 +35,79 @@ namespace Towl.WPF
             var builder = Host.CreateApplicationBuilder();
 
             builder.Services.AddSingleton(state);
-
             builder.Services.AddSingleton<DiscordIntegration>();
             builder.Services.AddHostedService<TimerBackgroundService>();
-
             builder.Services.AddHostedService(sp => new CursorMovedTestBackgroundService(ProcessUtils.GetCursorPosition, state));
-
             builder.Services.AddSingleton<TowlWindow>();
 
             _host = builder.Build();
             _host.Start();
 
-            _towlWindow = _host.Services.GetRequiredService<TowlWindow>();
-            _towlWindow.Closing += MainWindow_Closing;
-
-            _notifyIcon = new System.Windows.Forms.NotifyIcon();
-            _notifyIcon.Icon = System.Drawing.SystemIcons.Application; // TODO: replace with the app's own icon
-            _notifyIcon.Text = "Towl";
-            _notifyIcon.DoubleClick += (s, args) => ShowMainWindow();
-            _notifyIcon.Visible = true;
+            _towlMainWindow = _host.Services.GetRequiredService<TowlWindow>();
+            _towlMainWindow.Closing += TowlWindowClosing;
 
             CreateContextMenu();
+            ShowMainWindow();
         }
 
         private void CreateContextMenu()
         {
-            _notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            _notifyIcon.ContextMenuStrip.Items.Add("Open Towl").Click += (s, e) => ShowMainWindow();
-            _notifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ExitApplication();
+            _towlNotifyIcon = new NotifyIcon
+            {
+                Icon = SystemIcons.Application, // TODO: replace with the app's own icon
+                Text = "Towl"
+            };
+
+            _towlNotifyIcon.DoubleClick += (s, args) => ShowMainWindow();
+            _towlNotifyIcon.Visible = true;
+
+            _towlNotifyIcon!.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            _towlNotifyIcon.ContextMenuStrip.Items.Add("Open Towl").Click += (s, e) => ShowMainWindow();
+            _towlNotifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ExitApplication();
         }
 
         private void ExitApplication()
         {
             _isExit = true;
-            _notifyIcon.Visible = false;
-            _notifyIcon.Dispose();
-            _towlWindow.Close();
-            Application.Current.Shutdown();
+
+            _towlNotifyIcon!.Visible = false;
+            _towlNotifyIcon.Dispose();
+
+            _towlMainWindow!.Close();
+
+            Current.Shutdown();
         }
 
         private void ShowMainWindow()
         {
-            if (_towlWindow.IsVisible)
+            if (!_towlMainWindow!.IsVisible)
             {
-                if (_towlWindow.WindowState == WindowState.Minimized)
-                    _towlWindow.WindowState = WindowState.Normal;
+                _towlMainWindow.Show();
+                return;
+            }
 
-                _towlWindow.Activate();
-            }
-            else
-            {
-                _towlWindow.Show();
-            }
+            if (_towlMainWindow.WindowState == WindowState.Minimized)
+                _towlMainWindow.WindowState = WindowState.Normal;
+
+            _towlMainWindow.Activate();
         }
 
-        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        private void TowlWindowClosing(object? sender, CancelEventArgs e)
         {
-            if (!_isExit)
-            {
-                e.Cancel = true;
-                _towlWindow.Hide(); // A hidden window can be shown again, a closed one not
-            }
+            if (_isExit)
+                return;
+
+            e.Cancel = true;
+            _towlMainWindow!.Hide();
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            _notifyIcon?.Dispose();
+            _towlNotifyIcon?.Dispose();
 
             _host!.StopAsync().GetAwaiter().GetResult();
             _host.Dispose();
+
             base.OnExit(e);
         }
     }

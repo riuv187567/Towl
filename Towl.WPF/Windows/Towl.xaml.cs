@@ -1,9 +1,9 @@
 ﻿using System.Windows;
-using System.Windows.Media;
 using Towl.Core;
 using Towl.Core.Data;
 using Towl.Core.Data.Session;
 using Towl.Core.Utils;
+using Towl.WPF.Utils;
 
 namespace Towl.WPF
 {
@@ -19,23 +19,19 @@ namespace Towl.WPF
             _state = state;
             _discord = discord;
 
-            Loaded += async (a, b) => RunTimerAsync();
+            Loaded += async (a, b) => await RunTimerAsync();
         }
 
         private async Task RunTimerAsync()
         {
-            await UpdateMainTimer();
             var time = new PeriodicTimer(TimeSpan.FromSeconds(Constants.CycleSeconds));
 
-            while (await time.WaitForNextTickAsync())
+            do
             {
                 await UpdateMainTimer();
                 await UpdateSecondaryTimer();
                 await UpdateStatusBar();
-
-                await Task.Delay(Constants.CycleSeconds);
-                TowlDataManager.SaveData(_state.Data);
-            }
+            } while (await time.WaitForNextTickAsync());
         }
 
         private async Task UpdateMainTimer()
@@ -68,35 +64,21 @@ namespace Towl.WPF
         {
             var displayedProcName = _state.Settings.DisplayedProcessName;
 
-            var activeColor = new SolidColorBrush
-            {
-                Color = System.Windows.Media.Color.FromArgb(Constants.ActiveColor.A, Constants.ActiveColor.R, Constants.ActiveColor.G, Constants.ActiveColor.B)
-            };
-
-            var notActiveColor = new SolidColorBrush
-            {
-                Color = System.Windows.Media.Color.FromArgb(Constants.NotActiveColor.A, Constants.NotActiveColor.R, Constants.NotActiveColor.G, Constants.NotActiveColor.B)
-            };
-
-            var notFoundColor = new SolidColorBrush
-            {
-                Color = System.Windows.Media.Color.FromArgb(Constants.NotFoundColor.A, Constants.NotFoundColor.R, Constants.NotFoundColor.G, Constants.NotFoundColor.B)
-            };
-
             if (!_state.Data.ProcessEntries.TryGetValue(displayedProcName, out var process))
-                StatusBar.Fill = notFoundColor;
+                StatusBar.Fill = Constants.NotFoundColor.BrushFromDrawing();
             else
             {
                 if (ProcessUtils.ProcessIsFocused(displayedProcName) && _state.CursorMoved)
-                    StatusBar.Fill = activeColor;
+                    StatusBar.Fill = Constants.ActiveColor.BrushFromDrawing();
                 else
-                    StatusBar.Fill = notActiveColor;
+                    StatusBar.Fill = Constants.NotActiveColor.BrushFromDrawing();
             }
         }
 
-        private void Window_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
+        private void TowlWindowMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) => DragMove();
+
+        private void TowlWindowClose(object sender, RoutedEventArgs e) => Hide();
+
+        private void TowlWindowMinimize(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
     }
 }

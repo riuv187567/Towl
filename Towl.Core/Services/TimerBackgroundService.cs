@@ -44,6 +44,8 @@ public class TimerBackgroundService(TowlState state) : BackgroundService
 
                 processEntry.TotalSeconds = processEntry.DateEntries.Select((pair) => pair.Value).Sum();
             }
+
+            TowlDataManager.SaveData(_state.Data);
         }
     }
 }

@@ -32,7 +32,6 @@ public partial class Towl : Form
         while (await time.WaitForNextTickAsync())
         {
             await UpdateTimer();
-            await Task.Delay(Constants.CycleSeconds);
             TowlDataManager.SaveData(_state.Data);
         }
     }
