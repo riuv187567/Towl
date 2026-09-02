@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
+using Towl.Core.Data.Session;
+using Towl.Core.Data.Settings;
 
-namespace Towl.Data;
+namespace Towl.Core.Data;
 
 public static class TowlDataManager
 {

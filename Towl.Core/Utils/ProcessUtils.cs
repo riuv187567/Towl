@@ -1,12 +1,16 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Towl.Utils;
+namespace Towl.Core.Utils;
 
 public class ProcessUtils
 {
     [DllImport("user32.dll")]
     static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    static extern bool GetCursorPos(out Point lpPoint);
 
     static public bool ProcessIsFocused(string processName)
     {
@@ -18,5 +22,11 @@ public class ProcessUtils
                 return true;
 
         return false;
+    }
+
+    static public Point GetCursorPosition()
+    {
+        GetCursorPos(out var point);
+        return point;
     }
 }

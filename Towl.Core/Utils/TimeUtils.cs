@@ -1,4 +1,4 @@
-﻿namespace Towl.Utils;
+﻿namespace Towl.Core.Utils;
 
 public static class TimeUtils
 {

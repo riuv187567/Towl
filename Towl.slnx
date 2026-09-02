@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="Towl.Core/Towl.Core.csproj" Id="a34bc674-e918-42d7-a7bf-2561bb7d07c4" />
+  <Project Path="Towl.WPF/Towl.WPF.csproj" Id="a43c404a-d164-4033-834d-23dbc667c6b9" />
   <Project Path="Towl/Towl.csproj" />
 </Solution>

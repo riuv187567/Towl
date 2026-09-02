@@ -1,8 +1,8 @@
 ﻿using DiscordRPC;
-using Towl.Data;
-using Towl.Utils;
+using Towl.Core.Data;
+using Towl.Core.Utils;
 
-namespace Towl;
+namespace Towl.Core;
 
 public class DiscordIntegration : IDisposable
 {
@@ -13,9 +13,12 @@ public class DiscordIntegration : IDisposable
     {
         _state = state;
 
+        if (!_state.Settings.DiscordIntegration.EnableDiscordStatus)
+            return;
+
         try
         {
-            _client = new DiscordRpcClient(_state.Settings.DiscordAppId);
+            _client = new DiscordRpcClient(_state.Settings.DiscordIntegration.DiscordAppId);
 
             _client.OnReady += (sender, e) =>
             {

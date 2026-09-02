@@ -1,5 +1,7 @@
-using Towl.Data;
-using Towl.Utils;
+using Towl.Core;
+using Towl.Core.Data;
+using Towl.Core.Data.Session;
+using Towl.Core.Utils;
 
 namespace Towl;
 
@@ -30,7 +32,6 @@ public partial class Towl : Form
         while (await time.WaitForNextTickAsync())
         {
             await UpdateTimer();
-            await Task.Delay(Constants.CycleSeconds);
             TowlDataManager.SaveData(_state.Data);
         }
     }

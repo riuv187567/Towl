@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Towl.Data;
-using Towl.Utils;
+using Towl.Core.Data;
+using Towl.Core.Data.Session;
+using Towl.Core.Utils;
 
-namespace Towl.Services;
+namespace Towl.Core.Services;
 
 public class TimerBackgroundService(TowlState state) : BackgroundService
 {
@@ -43,6 +44,8 @@ public class TimerBackgroundService(TowlState state) : BackgroundService
 
                 processEntry.TotalSeconds = processEntry.DateEntries.Select((pair) => pair.Value).Sum();
             }
+
+            TowlDataManager.SaveData(_state.Data);
         }
     }
 }
