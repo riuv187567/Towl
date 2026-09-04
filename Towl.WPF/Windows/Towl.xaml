@@ -43,7 +43,7 @@
         </Style>
     </Window.Resources>
     <Border CornerRadius="10" Background="#FF1F2023" BorderBrush="Gray" BorderThickness="0.5">
-        <Grid>
+        <Grid Margin="0,4,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="*"/>
@@ -54,7 +54,7 @@
                     Style="{StaticResource TitleBarMinimizeButtonStyle}"/>
                 <Separator Opacity="0" Width="8"/>
                 <Button x:Name="ButtonClose" Click="TowlWindowClose" Content="✕"
-                    Style="{StaticResource TitleBarCloseButtonStyle}"/>
+                    Style="{StaticResource TitleBarCloseButtonStyle}" Margin="0,0,8,0"/>
             </StackPanel>
 
             <WrapPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">

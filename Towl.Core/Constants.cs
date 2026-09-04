@@ -11,7 +11,7 @@ public static class MainColors
 public static class Constants
 {
     public const int CycleSeconds = 1;
-    public const int CursorMoveTimeout = 5;
+    public const int CursorMoveTimeout = 10;
 
     public readonly static Color ActiveColor = MainColors.Green;
     public readonly static Color NotActiveColor = MainColors.Red;
