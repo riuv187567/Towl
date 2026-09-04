@@ -8,107 +8,106 @@ using Towl.Core.Services;
 using Towl.Core.Utils;
 using Application = System.Windows.Application;
 
-namespace Towl.WPF
+namespace Towl.WPF;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    private IHost? _host;
+    private TowlWindow? _towlMainWindow;
+
+    private NotifyIcon? _towlNotifyIcon;
+
+    private bool _isExit;
+
+    protected override void OnStartup(StartupEventArgs e)
     {
-        private IHost? _host;
-        private TowlWindow? _towlMainWindow;
+        base.OnStartup(e);
 
-        private NotifyIcon? _towlNotifyIcon;
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-        private bool _isExit;
-
-        protected override void OnStartup(StartupEventArgs e)
+        var state = new TowlState()
         {
-            base.OnStartup(e);
+            Data = TowlDataManager.LoadData(),
+            Settings = TowlDataManager.LoadSettings(),
+            CursorMoved = false,
+        };
 
-            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        var builder = Host.CreateApplicationBuilder();
 
-            var state = new TowlState()
-            {
-                Data = TowlDataManager.LoadData(),
-                Settings = TowlDataManager.LoadSettings(),
-                CursorMoved = false,
-            };
+        builder.Services.AddSingleton(state);
+        builder.Services.AddSingleton<DiscordIntegration>();
+        builder.Services.AddHostedService<TimerBackgroundService>();
+        builder.Services.AddHostedService(sp => new CursorMovedTestBackgroundService(ProcessUtils.GetCursorPosition, state));
+        builder.Services.AddSingleton<TowlWindow>();
 
-            var builder = Host.CreateApplicationBuilder();
+        _host = builder.Build();
+        _host.Start();
 
-            builder.Services.AddSingleton(state);
-            builder.Services.AddSingleton<DiscordIntegration>();
-            builder.Services.AddHostedService<TimerBackgroundService>();
-            builder.Services.AddHostedService(sp => new CursorMovedTestBackgroundService(ProcessUtils.GetCursorPosition, state));
-            builder.Services.AddSingleton<TowlWindow>();
+        _towlMainWindow = _host.Services.GetRequiredService<TowlWindow>();
+        _towlMainWindow.Closing += TowlWindowClosing;
 
-            _host = builder.Build();
-            _host.Start();
+        CreateContextMenu();
+        ShowMainWindow();
+    }
 
-            _towlMainWindow = _host.Services.GetRequiredService<TowlWindow>();
-            _towlMainWindow.Closing += TowlWindowClosing;
+    private void CreateContextMenu()
+    {
+        _towlNotifyIcon = new NotifyIcon
+        {
+            Icon = SystemIcons.Application, // TODO: replace with the app's own icon
+            Text = "Towl"
+        };
 
-            CreateContextMenu();
-            ShowMainWindow();
+        _towlNotifyIcon.DoubleClick += (s, args) => ShowMainWindow();
+        _towlNotifyIcon.Visible = true;
+
+        _towlNotifyIcon!.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+        _towlNotifyIcon.ContextMenuStrip.Items.Add("Open Towl").Click += (s, e) => ShowMainWindow();
+        _towlNotifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ExitApplication();
+    }
+
+    private void ExitApplication()
+    {
+        _isExit = true;
+
+        _towlNotifyIcon!.Visible = false;
+        _towlNotifyIcon.Dispose();
+
+        _towlMainWindow!.Close();
+
+        Current.Shutdown();
+    }
+
+    private void ShowMainWindow()
+    {
+        if (!_towlMainWindow!.IsVisible)
+        {
+            _towlMainWindow.Show();
+            return;
         }
 
-        private void CreateContextMenu()
-        {
-            _towlNotifyIcon = new NotifyIcon
-            {
-                Icon = SystemIcons.Application, // TODO: replace with the app's own icon
-                Text = "Towl"
-            };
+        if (_towlMainWindow.WindowState == WindowState.Minimized)
+            _towlMainWindow.WindowState = WindowState.Normal;
 
-            _towlNotifyIcon.DoubleClick += (s, args) => ShowMainWindow();
-            _towlNotifyIcon.Visible = true;
+        _towlMainWindow.Activate();
+    }
 
-            _towlNotifyIcon!.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
-            _towlNotifyIcon.ContextMenuStrip.Items.Add("Open Towl").Click += (s, e) => ShowMainWindow();
-            _towlNotifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ExitApplication();
-        }
+    private void TowlWindowClosing(object? sender, CancelEventArgs e)
+    {
+        if (_isExit)
+            return;
 
-        private void ExitApplication()
-        {
-            _isExit = true;
+        e.Cancel = true;
+        _towlMainWindow!.Hide();
+    }
 
-            _towlNotifyIcon!.Visible = false;
-            _towlNotifyIcon.Dispose();
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _towlNotifyIcon?.Dispose();
 
-            _towlMainWindow!.Close();
+        _host!.StopAsync().GetAwaiter().GetResult();
+        _host.Dispose();
 
-            Current.Shutdown();
-        }
-
-        private void ShowMainWindow()
-        {
-            if (!_towlMainWindow!.IsVisible)
-            {
-                _towlMainWindow.Show();
-                return;
-            }
-
-            if (_towlMainWindow.WindowState == WindowState.Minimized)
-                _towlMainWindow.WindowState = WindowState.Normal;
-
-            _towlMainWindow.Activate();
-        }
-
-        private void TowlWindowClosing(object? sender, CancelEventArgs e)
-        {
-            if (_isExit)
-                return;
-
-            e.Cancel = true;
-            _towlMainWindow!.Hide();
-        }
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            _towlNotifyIcon?.Dispose();
-
-            _host!.StopAsync().GetAwaiter().GetResult();
-            _host.Dispose();
-
-            base.OnExit(e);
-        }
+        base.OnExit(e);
     }
 }
