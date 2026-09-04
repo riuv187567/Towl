@@ -30,7 +30,7 @@ public class TimerBackgroundService(TowlState state) : BackgroundService
                 if (!ProcessUtils.ProcessIsFocused(tracked.Name))
                     continue;
 
-                var processEntry = new ProcessEntry() { Name = tracked.Name, TotalSeconds = 1 };
+                var processEntry = new ProcessEntry() { Name = tracked.Name };
 
                 if (_state.Data.ProcessEntries.TryGetValue(tracked.Name, out var value))
                     processEntry = value;
@@ -41,8 +41,6 @@ public class TimerBackgroundService(TowlState state) : BackgroundService
                     processEntry.DateEntries[today] += 1;
                 else
                     processEntry.DateEntries.Add(today, 1);
-
-                processEntry.TotalSeconds = processEntry.DateEntries.Select((pair) => pair.Value).Sum();
             }
 
             TowlDataManager.SaveData(_state.Data);

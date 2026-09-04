@@ -3,6 +3,7 @@
 public class ProcessEntry()
 {
     public string Name { get; set; } = "";
-    public long TotalSeconds { get; set; } = 0;
     public Dictionary<DateOnly, long> DateEntries { get; set; } = [];
+
+    public long TotalSeconds => DateEntries.Values.Sum();
 }
