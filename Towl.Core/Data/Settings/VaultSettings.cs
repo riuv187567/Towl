@@ -1,6 +1,6 @@
 ﻿namespace Towl.Core.Data.Settings;
 
-public struct TowlSettings()
+public struct VaultSettings()
 {
     public string DisplayedProcessName { get; set; } = "";
     public List<TrackedProcessSettings> TrackedProcessSettings { get; set; } = [];

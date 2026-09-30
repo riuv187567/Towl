@@ -8,7 +8,7 @@ public static class TimeUtils
         long minutes = (totalSeconds % 3600) / 60;
         long seconds = totalSeconds % 60;
 
-        return $"{hours.ToString("D2")}:{minutes.ToString("D2")}:{seconds.ToString("D2")}";
+        return $"{hours:D2}:{minutes:D2}:{seconds:D2}";
     }
 
     public static DateOnly GetToday() => DateOnly.FromDateTime(DateTime.Now);

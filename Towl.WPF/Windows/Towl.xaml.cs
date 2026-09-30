@@ -2,6 +2,7 @@
 using Towl.Core;
 using Towl.Core.Data;
 using Towl.Core.Data.Session;
+using Towl.Core.Services;
 using Towl.Core.Utils;
 using Towl.WPF.Utils;
 
@@ -9,15 +10,17 @@ namespace Towl.WPF;
 
 public partial class TowlWindow : Window
 {
-    private readonly TowlState _state;
+    private readonly VaultManager _state;
     private readonly DiscordIntegration _discord;
+    private readonly CursorMovedBackgroundService _cursorMovedTest;
 
-    public TowlWindow(TowlState state, DiscordIntegration discord)
+    public TowlWindow(VaultManager state, CursorMovedBackgroundService cursorMovedTest, DiscordIntegration discord)
     {
         InitializeComponent();
 
         _state = state;
         _discord = discord;
+        _cursorMovedTest = cursorMovedTest;
 
         Loaded += async (a, b) => await RunTimerAsync();
     }
@@ -36,39 +39,42 @@ public partial class TowlWindow : Window
 
     private async Task UpdateMainTimer()
     {
-        var displayedProcName = _state.Settings.DisplayedProcessName;
-        if (!_state.Data.ProcessEntries.TryGetValue(displayedProcName, out var process))
+        var shownProcName = _state.Current!.Settings.DisplayedProcessName;
+
+        if (!_state.Current!.Data.ProcessEntryExist(shownProcName))
         {
             MainTimeText.Text = Constants.NoProcessDisplayedText;
             return;
         }
 
-        var todayTimeString = TimeUtils.HumanizeTime(_state.Data.GetTodaySeconds(process.Name));
+        var todayTimeString = TimeUtils.HumanizeTime(_state.Current!.Data.GetTodaySeconds(shownProcName));
         MainTimeText.Text = todayTimeString;
         _discord.SetDescription($"Tracked Time - {todayTimeString}"); // Todo: This should be moved to somewhere else
     }
 
     private async Task UpdateSecondaryTimer()
     {
-        if (!_state.Data.ProcessEntries.TryGetValue(_state.Settings.DisplayedProcessName, out var process))
+        var shownProcName = _state.Current!.Settings.DisplayedProcessName;
+
+        if (!_state.Current!.Data.ProcessEntryExist(shownProcName))
         {
             SecondaryTimeText.Text = Constants.NoProcessDisplayedText;
             return;
         }
 
-        var todayTimeString = TimeUtils.HumanizeTime(process.TotalSeconds);
+        var todayTimeString = TimeUtils.HumanizeTime(_state.Current!.Data.GetTotalSeconds(shownProcName));
         SecondaryTimeText.Text = todayTimeString;
     }
 
     private async Task UpdateStatusBar()
     {
-        var displayedProcName = _state.Settings.DisplayedProcessName;
+        var shownProcName = _state.Current!.Settings.DisplayedProcessName;
 
-        if (!_state.Data.ProcessEntries.TryGetValue(displayedProcName, out var process))
+        if (!_state.Current!.Data.ProcessEntryExist(shownProcName))
             StatusBar.Fill = Constants.NotFoundColor.BrushFromDrawing();
         else
         {
-            if (ProcessUtils.ProcessIsFocused(displayedProcName) && _state.CursorMoved)
+            if (ProcessUtils.ProcessIsFocused(shownProcName) && _cursorMovedTest.CursorMoved)
                 StatusBar.Fill = Constants.ActiveColor.BrushFromDrawing();
             else
                 StatusBar.Fill = Constants.NotActiveColor.BrushFromDrawing();

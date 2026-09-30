@@ -16,20 +16,22 @@ public static class Program
     {
         ApplicationConfiguration.Initialize();
 
+        var towlStore = new TowlDataStore();
+
         var state = new TowlState()
         {
-            Data = TowlDataManager.LoadData(),
-            Settings = TowlDataManager.LoadSettings(),
-            CursorMoved = false,
+            Data = towlStore.LoadData(),
+            Settings = towlStore.LoadSettings(),
         };
 
         var builder = Host.CreateApplicationBuilder();
 
         builder.Services.AddSingleton(state);
+        builder.Services.AddSingleton<IDataStore>(towlStore);
 
         builder.Services.AddSingleton<DiscordIntegration>();
         builder.Services.AddHostedService<TimerBackgroundService>();
-        builder.Services.AddHostedService(sp => new CursorMovedTestBackgroundService(() => Cursor.Position, state));
+        builder.Services.AddHostedService(sp => new CursorMovedTestBackgroundService(() => Cursor.Position));
 
         builder.Services.AddSingleton<Towl>();
 

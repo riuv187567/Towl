@@ -1,24 +1,23 @@
 ﻿using DiscordRPC;
 using Towl.Core.Data;
-using Towl.Core.Utils;
 
-namespace Towl.Core;
+namespace Towl.Core.Services;
 
 public class DiscordIntegration : IDisposable
 {
-    private readonly TowlState _state;
+    private readonly VaultManager _state;
     private readonly DiscordRpcClient? _client;
 
-    public DiscordIntegration(TowlState state)
+    public DiscordIntegration(VaultManager state)
     {
         _state = state;
 
-        if (!_state.Settings.DiscordIntegration.EnableDiscordStatus)
+        if (!_state.Current!.Settings.DiscordIntegration.EnableDiscordStatus)
             return;
 
         try
         {
-            _client = new DiscordRpcClient(_state.Settings.DiscordIntegration.DiscordAppId);
+            _client = new DiscordRpcClient(_state.Current!.Settings.DiscordIntegration.DiscordAppId);
 
             _client.OnReady += (sender, e) =>
             {
@@ -33,8 +32,6 @@ public class DiscordIntegration : IDisposable
             };
 
             _client.Initialize();
-
-            SetDescription($"Tracked Time - {TimeUtils.HumanizeTime(7061760)}");
         }
         catch (Exception)
         {

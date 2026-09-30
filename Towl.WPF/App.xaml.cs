@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using System.ComponentModel;
 using System.Windows;
-using Towl.Core;
 using Towl.Core.Data;
 using Towl.Core.Services;
 using Towl.Core.Utils;
@@ -25,19 +24,16 @@ public partial class App : Application
 
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-        var state = new TowlState()
-        {
-            Data = TowlDataManager.LoadData(),
-            Settings = TowlDataManager.LoadSettings(),
-            CursorMoved = false,
-        };
-
         var builder = Host.CreateApplicationBuilder();
 
-        builder.Services.AddSingleton(state);
+        builder.Services.AddSingleton<VaultManager>();
         builder.Services.AddSingleton<DiscordIntegration>();
+
+        builder.Services.AddSingleton(sp => new CursorMovedBackgroundService(ProcessUtils.GetCursorPosition));
+        builder.Services.AddHostedService(sp => sp.GetRequiredService<CursorMovedBackgroundService>());
+
         builder.Services.AddHostedService<TimerBackgroundService>();
-        builder.Services.AddHostedService(sp => new CursorMovedTestBackgroundService(ProcessUtils.GetCursorPosition, state));
+        builder.Services.AddHostedService<VaultBackupService>();
         builder.Services.AddSingleton<TowlWindow>();
 
         _host = builder.Build();
@@ -61,7 +57,7 @@ public partial class App : Application
         _towlNotifyIcon.DoubleClick += (s, args) => ShowMainWindow();
         _towlNotifyIcon.Visible = true;
 
-        _towlNotifyIcon!.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+        _towlNotifyIcon!.ContextMenuStrip = new ContextMenuStrip();
         _towlNotifyIcon.ContextMenuStrip.Items.Add("Open Towl").Click += (s, e) => ShowMainWindow();
         _towlNotifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ExitApplication();
     }
@@ -105,7 +101,9 @@ public partial class App : Application
     {
         _towlNotifyIcon?.Dispose();
 
+        var vaultManager = _host!.Services.GetRequiredService<VaultManager>();
         _host!.StopAsync().GetAwaiter().GetResult();
+        vaultManager._storage.SaveData(vaultManager.Current.Data);
         _host.Dispose();
 
         base.OnExit(e);

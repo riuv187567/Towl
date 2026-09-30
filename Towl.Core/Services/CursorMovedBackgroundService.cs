@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Hosting;
 using System.Drawing;
-using Towl.Core.Data;
 
 namespace Towl.Core.Services;
 
-public class CursorMovedTestBackgroundService(Func<Point> cursorPosition, TowlState state) : BackgroundService
+public class CursorMovedBackgroundService(Func<Point> cursorPosition) : BackgroundService
 {
     private readonly Func<Point> _cursorPosition = cursorPosition;
-    private readonly TowlState _state = state;
+    public bool CursorMoved { get; private set; } = false;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -18,7 +17,7 @@ public class CursorMovedTestBackgroundService(Func<Point> cursorPosition, TowlSt
         {
             var newCursorPosition = _cursorPosition();
 
-            _state.CursorMoved = newCursorPosition != cursorPosition;
+            CursorMoved = newCursorPosition != cursorPosition;
             cursorPosition = newCursorPosition;
         }
     }

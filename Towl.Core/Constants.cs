@@ -18,6 +18,7 @@ public static class Constants
     public readonly static Color NotFoundColor = Color.LightGray;
 
     public const string ApplicationDataFile = "Data.json";
+    public const string ApplicationBackupDataFile = "DataBackup.json";
     public const string ApplicationSettingsFile = "Settings.json";
 
     public const string NoProcessDisplayedText = "No process displayed";
