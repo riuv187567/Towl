@@ -6,6 +6,6 @@ namespace Towl.Core.Data.Store;
 public interface IDataStore
 {
     public VaultSettings LoadSettings();
-    public VaultSessionData LoadData();
-    public void SaveData(VaultSessionData data);
+    public VaultData LoadData();
+    public void SaveData(VaultData data);
 }

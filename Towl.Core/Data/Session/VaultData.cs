@@ -2,7 +2,7 @@
 
 namespace Towl.Core.Data.Session;
 
-public class VaultSessionData()
+public class VaultData()
 {
     [JsonInclude]
     [JsonPropertyName("ProcessEntries")]

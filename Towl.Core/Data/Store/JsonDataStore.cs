@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Towl.Core.Data.Session;
 using Towl.Core.Data.Settings;
+using Towl.Core.Utils;
 
 namespace Towl.Core.Data.Store;
 
@@ -24,37 +25,29 @@ public class JsonDataStore : IDataStore
         return new VaultSettings();
     }
 
-    public VaultSessionData LoadData()
+    public VaultData LoadData()
     {
         try
         {
-            return JsonSerializer.Deserialize<VaultSessionData>(File.ReadAllText(Constants.ApplicationDataFile))!;
+            return JsonSerializer.Deserialize<VaultData>(File.ReadAllText(Constants.ApplicationDataFile))!;
         }
         catch (FileNotFoundException)
         {
-            var data = new VaultSessionData();
+            var data = new VaultData();
             var jsonString = JsonSerializer.Serialize(data, _options);
             File.WriteAllText(Constants.ApplicationDataFile, jsonString);
         }
 
-        return new VaultSessionData();
+        return new VaultData();
     }
 
-    public void SaveData(VaultSessionData data)
+    public void SaveData(VaultData data)
     {
         lock (data.Lock)
         {
             var jsonString = JsonSerializer.Serialize(data, _options);
 
-            try
-            {
-                File.WriteAllText(Constants.ApplicationBackupDataFile, jsonString);
-                File.Move(Constants.ApplicationBackupDataFile, Constants.ApplicationDataFile, overwrite: true);
-            }
-            catch
-            {
-                // Failed to save
-            }
+            FileUtils.WriteFileSafe(Constants.ApplicationDataFile, jsonString, Constants.ApplicationBackupDataFile);
         }
     }
 }

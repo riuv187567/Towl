@@ -5,6 +5,6 @@ namespace Towl.Core.Data;
 
 public class Vault
 {
-    public required VaultSessionData Data { get; set; } = new();
+    public required VaultData Data { get; set; } = new();
     public required VaultSettings Settings { get; set; } = new();
 }

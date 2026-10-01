@@ -5,6 +5,7 @@ using System.Windows;
 using Towl.Core.Data;
 using Towl.Core.Services;
 using Towl.Core.Utils;
+using Towl.WPF.Service;
 using Application = System.Windows.Application;
 
 namespace Towl.WPF;
@@ -12,22 +13,22 @@ namespace Towl.WPF;
 public partial class App : Application
 {
     private IHost? _host;
-    private TowlWindow? _towlMainWindow;
-
-    private NotifyIcon? _towlNotifyIcon;
-
     private bool _isExit;
+
+    private TowlWindow? _towlMainWindow;
+    private NotifyIcon? _towlNotifyIcon;
+    private IMessageDialogService? _errorDialog;
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         var builder = Host.CreateApplicationBuilder();
 
         builder.Services.AddSingleton<VaultManager>();
         builder.Services.AddSingleton<DiscordIntegration>();
+        builder.Services.AddSingleton<IMessageDialogService, MessageDialogService>();
 
         builder.Services.AddSingleton(sp => new CursorMovedBackgroundService(ProcessUtils.GetCursorPosition));
         builder.Services.AddHostedService(sp => sp.GetRequiredService<CursorMovedBackgroundService>());
@@ -40,7 +41,15 @@ public partial class App : Application
         _host.Start();
 
         _towlMainWindow = _host.Services.GetRequiredService<TowlWindow>();
-        _towlMainWindow.Closing += TowlWindowClosing;
+        _towlMainWindow.Closing += (object? sender, CancelEventArgs e) => {
+            if (_isExit)
+                return;
+
+            e.Cancel = true;
+            _towlMainWindow!.Hide();
+        };
+
+        _errorDialog = _host.Services.GetRequiredService<IMessageDialogService>();
 
         CreateContextMenu();
         ShowMainWindow();
@@ -62,18 +71,6 @@ public partial class App : Application
         _towlNotifyIcon.ContextMenuStrip.Items.Add("Exit").Click += (s, e) => ExitApplication();
     }
 
-    private void ExitApplication()
-    {
-        _isExit = true;
-
-        _towlNotifyIcon!.Visible = false;
-        _towlNotifyIcon.Dispose();
-
-        _towlMainWindow!.Close();
-
-        Current.Shutdown();
-    }
-
     private void ShowMainWindow()
     {
         if (!_towlMainWindow!.IsVisible)
@@ -88,13 +85,16 @@ public partial class App : Application
         _towlMainWindow.Activate();
     }
 
-    private void TowlWindowClosing(object? sender, CancelEventArgs e)
+    private void ExitApplication()
     {
-        if (_isExit)
-            return;
+        _isExit = true;
 
-        e.Cancel = true;
-        _towlMainWindow!.Hide();
+        _towlNotifyIcon!.Visible = false;
+        _towlNotifyIcon.Dispose();
+
+        _towlMainWindow!.Close();
+
+        Current.Shutdown();
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -103,7 +103,15 @@ public partial class App : Application
 
         var vaultManager = _host!.Services.GetRequiredService<VaultManager>();
         _host!.StopAsync().GetAwaiter().GetResult();
-        vaultManager._storage.SaveData(vaultManager.Current.Data);
+
+        try
+        {
+            vaultManager._storage.SaveData(vaultManager.Current.Data);
+        } catch
+        {
+            _errorDialog!.ShowError("Failed to perform vault backup");
+        }
+
         _host.Dispose();
 
         base.OnExit(e);
