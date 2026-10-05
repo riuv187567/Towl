@@ -108,8 +108,7 @@ public partial class App : Application
         try
         {
             if (vaultManager.Current.SavingEnabled)
-                vaultManager._storage.SaveVault(vaultManager.Current.Data);
-
+                vaultManager._storage.SaveVault(vaultManager.Current.Data, vaultManager.Current.Settings);
         }
         catch
         {

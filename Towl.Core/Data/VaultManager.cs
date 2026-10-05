@@ -19,23 +19,14 @@ public class VaultManager
 
         try
         {
-            _storage.TryLoadData(out var data);
+            _storage.TryLoadVault(out var data, out var settings);
             Current.Data = data;
+            Current.Settings = settings;
         }
         catch
         {
             _errorDialogService.ShowErrorMessage("Failed to load vault, saving is disabled");
             Current.SavingEnabled = false;
-        }
-
-        try
-        {
-            _storage.TryLoadSettings(out var settings);
-            Current.Settings = settings;
-        }
-        catch
-        {
-            _errorDialogService.ShowErrorMessage("Failed to load vault settings");
         }
     }
 }

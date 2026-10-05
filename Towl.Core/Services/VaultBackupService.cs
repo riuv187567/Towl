@@ -20,7 +20,7 @@ public class VaultBackupService(VaultManager state, IMessageDialogService errorD
 
             try
             {
-                _state._storage.SaveVault(_state.Current.Data);
+                _state._storage.SaveVault(_state.Current.Data, _state.Current.Settings);
                 _saveFailed = false;
             }
             catch

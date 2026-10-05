@@ -9,23 +9,27 @@ public class JsonDataStore : IDataStore
 {
     private readonly JsonSerializerOptions _options = new() { WriteIndented = true };
 
-    public void TryLoadData(out VaultData vaultData)
+    public void TryLoadVault(out VaultData vaultData, out VaultSettings vaultSettings)
     {
-        var dataExists = File.Exists(Constants.ApplicationDataFile);
-        var backupExists = File.Exists(Constants.ApplicationBackupDataFile);
+        var dataExists = File.Exists(Constants.VaultFilename);
+        var backupExists = File.Exists(Constants.VaultBackupFilename);
 
         if (!dataExists && !backupExists) // Vault is not created, create new vault
         {
             vaultData = new VaultData();
-            SaveVault(vaultData);
+            vaultSettings = new VaultSettings();
+            SaveVault(vaultData, vaultSettings);
             return;
         }
 
         try // Load vault
         {
-            var content = File.ReadAllText(Constants.ApplicationDataFile);
-            vaultData = JsonSerializer.Deserialize<VaultData>(content)
+            var content = File.ReadAllText(Constants.VaultFilename);
+            var vaultJson = JsonSerializer.Deserialize<VaultJson>(content)
                 ?? throw new Exception("Failed to laod vault");
+
+            vaultData = vaultJson.Data;
+            vaultSettings = vaultJson.Settings;
 
             return;
         }
@@ -34,37 +38,29 @@ public class JsonDataStore : IDataStore
             if (!backupExists)
                 throw new Exception("Failed to load vault, backup is missing");
 
-            var backupContent = File.ReadAllText(Constants.ApplicationBackupDataFile);
-            vaultData = JsonSerializer.Deserialize<VaultData>(backupContent)
+            var backupContent = File.ReadAllText(Constants.VaultBackupFilename);
+            var vaultJson = JsonSerializer.Deserialize<VaultJson>(backupContent)
                 ?? throw new Exception("Failed to load backup vault");
 
+            vaultData = vaultJson.Data;
+            vaultSettings = vaultJson.Settings;
+
             return;
         }
     }
 
-    public void TryLoadSettings(out VaultSettings vaultSettings)
-    {
-        try
-        {
-            vaultSettings = JsonSerializer.Deserialize<VaultSettings>(File.ReadAllText(Constants.ApplicationSettingsFile))!;
-            return;
-        }
-        catch (FileNotFoundException)
-        {
-            var settings = new VaultSettings();
-            var jsonString = JsonSerializer.Serialize(settings, _options);
-            File.WriteAllText(Constants.ApplicationSettingsFile, jsonString);
-        }
-
-        vaultSettings = new VaultSettings();
-    }
-
-    public void SaveVault(VaultData data)
+    public void SaveVault(VaultData data, VaultSettings vaultSettings)
     {
         lock (data.Lock)
         {
-            var jsonString = JsonSerializer.Serialize(data, _options);
-            FileUtils.WriteFileSafe(Constants.ApplicationDataFile, jsonString, Constants.ApplicationBackupDataFile);
+            var vaultJson = new VaultJson()
+            {
+                Data = data,
+                Settings = vaultSettings
+            };
+
+            var jsonString = JsonSerializer.Serialize(vaultJson, _options);
+            FileUtils.WriteFileSafe(Constants.VaultFilename, jsonString, Constants.VaultBackupFilename);
         }
     }
 }
