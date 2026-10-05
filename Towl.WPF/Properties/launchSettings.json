@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Towl.WPF": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Programming\\Towl"
+    }
+  }
+}

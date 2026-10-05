@@ -431,3 +431,6 @@ FodyWeavers.xsd
 Sessions.json
 Settings.json
 Data.json
+DataBackup.json
+Vault.json
+VaultBackup.json

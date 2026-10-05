@@ -1,0 +1,15 @@
+﻿namespace Towl.Core.Utils;
+
+public static class TimeUtils
+{
+    public static string HumanizeTime(long totalSeconds)
+    {
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        return $"{hours:D2}:{minutes:D2}:{seconds:D2}";
+    }
+
+    public static DateOnly GetToday() => DateOnly.FromDateTime(DateTime.Now);
+}
