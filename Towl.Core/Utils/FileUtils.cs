@@ -14,7 +14,7 @@ public static class FileUtils
             else
                 File.Move(tempFilePath, filePath, overwrite: true);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             throw;
         }

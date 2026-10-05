@@ -7,6 +7,7 @@ public class VaultBackupService(VaultManager state, IMessageDialogService errorD
 {
     private readonly VaultManager _state = state;
     private readonly IMessageDialogService _errorDialogService = errorDialogService;
+    private bool _saveFailed = false;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -14,13 +15,20 @@ public class VaultBackupService(VaultManager state, IMessageDialogService errorD
 
         while (await time.WaitForNextTickAsync(stoppingToken))
         {
+            if (!_state.Current.SavingEnabled)
+                continue;
+
             try
             {
-                _state._storage.SaveData(_state.Current.Data);
+                _state._storage.SaveVault(_state.Current.Data);
+                _saveFailed = false;
             }
             catch
             {
-                _errorDialogService.ShowError("Failed to perform vault backup");
+                if (!_saveFailed) // Error message shown only once
+                    _errorDialogService.ShowErrorMessage("Failed to perform vault backup");
+
+                _saveFailed = true;
             }
         }
     }

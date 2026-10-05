@@ -5,6 +5,8 @@ namespace Towl.Core.Data;
 
 public class Vault
 {
-    public required VaultData Data { get; set; } = new();
-    public required VaultSettings Settings { get; set; } = new();
+    public VaultData Data { get; set; } = new();
+    public VaultSettings Settings { get; set; } = new();
+
+    public bool SavingEnabled { get; set; } = true;
 }

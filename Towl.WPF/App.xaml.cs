@@ -41,7 +41,8 @@ public partial class App : Application
         _host.Start();
 
         _towlMainWindow = _host.Services.GetRequiredService<TowlWindow>();
-        _towlMainWindow.Closing += (object? sender, CancelEventArgs e) => {
+        _towlMainWindow.Closing += (object? sender, CancelEventArgs e) =>
+        {
             if (_isExit)
                 return;
 
@@ -106,10 +107,13 @@ public partial class App : Application
 
         try
         {
-            vaultManager._storage.SaveData(vaultManager.Current.Data);
-        } catch
+            if (vaultManager.Current.SavingEnabled)
+                vaultManager._storage.SaveVault(vaultManager.Current.Data);
+
+        }
+        catch
         {
-            _errorDialog!.ShowError("Failed to perform vault backup");
+            _errorDialog!.ShowErrorMessage("Failed to perform vault backup");
         }
 
         _host.Dispose();

@@ -5,7 +5,8 @@ namespace Towl.Core.Data.Store;
 
 public interface IDataStore
 {
-    public VaultSettings LoadSettings();
-    public VaultData LoadData();
-    public void SaveData(VaultData data);
+    public void TryLoadData(out VaultData vaultData);
+    public void TryLoadSettings(out VaultSettings vaultSettings);
+
+    public void SaveVault(VaultData data);
 }
